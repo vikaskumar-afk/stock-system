@@ -57,7 +57,7 @@
     </div>
 
     <!-- Additional Custom Scripts -->
-    <!-- @stack('scripts') -->
+    @stack('scripts')
 </body>
 
 </html>

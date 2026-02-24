@@ -68,14 +68,14 @@
                                     {{ $customer->created_at->format('M d, Y') }}
                                 </td>
                                 <td class="px-6 py-4 text-right whitespace-nowrap">
-                                    <!-- <button type="button"
+                                    <button type="button"
                                         class="text-blue-600 hover:text-blue-800 font-bold mr-3 edit-customer-btn"
                                         data-id="{{ $customer->id }}"
                                         data-name="{{ $customer->name }}"
                                         data-email="{{ $customer->email }}"
                                         data-subscription="{{ $customer->subscription_id }}">
                                         Edit
-                                    </button> -->
+                                    </button>
                                     <form action="{{ route('admin.customers.destroy', $customer) }}" method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')
@@ -216,7 +216,7 @@
     </div>
 
     <!-- Edit Customer Modal -->
-    <!-- <div id="editCustomerModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div id="editCustomerModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeModal('editCustomerModal')"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
@@ -269,7 +269,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                                         </svg>
                                     </div>
-                                    <input type="email" id="edit_email" name="email" class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 transition duration-150" placeholder="john@example.com" value="{{ old('form_type') == 'edit' ? old('email') : '' }}" required>
+                                    <input type="email" id="edit_email" name="email" class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-500 cursor-not-allowed focus:outline-none" placeholder="john@example.com" value="{{ old('form_type') == 'edit' ? old('email') : '' }}" readonly>
                                 </div>
                             </div>
                         </div>
@@ -326,7 +326,7 @@
                 </div>
             </div>
         </div>
-    </div> -->
+    </div> 
 
     <script>
         function openModal(modalId) {

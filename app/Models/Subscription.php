@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\Customer;
 class Subscription extends Model
 {
     protected $fillable = ['name', 'recommendation_limit'];
@@ -11,5 +11,10 @@ class Subscription extends Model
     public function stocks()
     {
         return $this->hasMany(Stock::class);
+    }
+
+    public function customers()
+    {
+        return $this->hasMany(Customer::class, 'subscription_id');
     }
 }
