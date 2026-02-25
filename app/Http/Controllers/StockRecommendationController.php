@@ -18,7 +18,7 @@ class StockRecommendationController extends Controller
         $subscriptions = Subscription::all();
         $recommendations = StockRecommendation::with(['stock', 'subscription', 'customers'])
             ->latest()
-            ->get();
+            ->paginate(10);
 
         return view('admin.stocks.stock_recommendation', compact('stocks', 'subscriptions', 'recommendations'));
     }
@@ -26,6 +26,7 @@ class StockRecommendationController extends Controller
     public function getRelatedCustomers(Subscription $subscription)
     {
         $customers = $subscription->customers()
+            ->where('remaining_recommendations', '>', 0)
             ->select('id', 'name', 'email')
             ->get();
 
@@ -42,24 +43,17 @@ class StockRecommendationController extends Controller
             'customer_ids.*' => 'exists:customers,id',
         ]);
 
-        // Check for duplicates
-        $duplicates = DB::table('recommend_customers')
-            ->join('stock_recommends', 'recommend_customers.stock_recommend_id', '=', 'stock_recommends.id')
-            ->where('stock_recommends.stock_id', $request->stock_id)
-            ->where('stock_recommends.subscription_id', $request->subscription_id)
-            ->whereIn('recommend_customers.customer_id', $request->customer_ids)
-            ->join('customers', 'recommend_customers.customer_id', '=', 'customers.id')
-            ->select('customers.name', 'customers.email')
-            ->get()
-            ->map(fn($item) => "{$item->name} ({$item->email})")
-            ->toArray();
+        $customers = \App\Models\Customer::whereIn('id', $request->customer_ids)->get();
 
-        if (!empty($duplicates)) {
-            $names = implode(', ', $duplicates);
-            return redirect()->back()->with('error', "The following customers have already received this recommendation: {$names}");
-        }
+        // Check if all selected customers have enough limit
+        // $customersWithNoLimit = $customers->filter(fn($c) => $c->remaining_recommendations <= 0);
 
-        DB::transaction(function () use ($request) {
+        // if ($customersWithNoLimit->isNotEmpty()) {
+        //     $names = $customersWithNoLimit->pluck('name')->implode(', ');
+        //     return redirect()->back()->with('error', "The following customers have no remaining recommendation limit: {$names}");
+        // }
+
+        DB::transaction(function () use ($request, $customers) {
             // 1. Create the master record
             $recommendation = StockRecommendation::create([
                 'stock_id' => $request->stock_id,
@@ -68,18 +62,14 @@ class StockRecommendationController extends Controller
 
             // 2. Attach customers
             $recommendation->customers()->attach($request->customer_ids);
+
+            // 3. Decrement limit for each customer
+            foreach ($customers as $customer) {
+                $customer->decrement('remaining_recommendations');
+            }
         });
 
         return redirect()->back()->with('success', 'Stock recommendation sent successfully!');
     }
 
-    // Fetch customers by subscription (AJAX)
-    // public function getCustomersBySubscription($subscriptionId)
-    // {
-    //     // Adjust this if your User model has a relation with subscription
-    //     $customers = User::where('subscription_id', $subscriptionId)
-    //                      ->get(['id', 'name', 'email']);
-
-    //     return response()->json($customers);
-    // }
 }

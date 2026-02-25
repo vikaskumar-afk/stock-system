@@ -46,6 +46,7 @@
                             <th class="px-6 py-4">Name</th>
                             <th class="px-6 py-4">Email</th>
                             <th class="px-6 py-4">Subscription</th>
+                            <th class="px-6 py-4">Remaining Recommendations</th>
                             <th class="px-6 py-4">Created Date</th>
                             <th class="px-6 py-4 text-right">Actions</th>
                         </tr>
@@ -64,6 +65,11 @@
                                         {{ $customer->subscription->name ?? 'N/A' }}
                                     </span>
                                 </td>
+                                <td class="px-6 py-4">
+                                    <span class="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-full">
+                                        {{ $customer->remaining_recommendations ?? 'N/A' }}
+                                    </span>
+                                </td>
                                 <td class="px-6 py-4 text-gray-500 text-sm">
                                     {{ $customer->created_at->format('M d, Y') }}
                                 </td>
@@ -76,14 +82,14 @@
                                         data-subscription="{{ $customer->subscription_id }}">
                                         Edit
                                     </button>
-                                    <form action="{{ route('admin.customers.destroy', $customer) }}" method="POST" class="inline">
+                                    <!-- <form action="{{ route('admin.customers.destroy', $customer) }}" method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:text-red-800 font-bold"
                                             onclick="return confirm('Are you sure you want to delete this customer?')">
                                             Delete
                                         </button>
-                                    </form>
+                                    </form> -->
                                 </td>
                             </tr>
                         @empty

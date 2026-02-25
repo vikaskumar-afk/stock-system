@@ -94,6 +94,9 @@
                     </tbody>
                 </table>
             </div>
+            <div class="px-8 py-4 border-t border-gray-100">
+                {{ $recommendations->links() }}
+            </div>
         </div>
 
         {{-- Recommendation Modal --}}

@@ -64,13 +64,13 @@
                                         data-limit="{{ $subscription->recommendation_limit }}">
                                         Edit
                                     </button>
-                                    <form action="{{ route('admin.subscriptions.destroy', $subscription) }}" method="POST"
+                                    <!-- <form action="{{ route('admin.subscriptions.destroy', $subscription) }}" method="POST"
                                         class="inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:text-red-800 font-semibold"
                                             onclick="return confirm('Are you sure you want to delete this plan?')">Delete</button>
-                                    </form>
+                                    </form> -->
                                 </td>
                             </tr>
                         @empty

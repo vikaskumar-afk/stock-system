@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Stock extends Model
 {
-    protected $fillable = ['stock_name', 'stock_listing', 'subscription_id'];
+    protected $fillable = ['stock_name', 'stock_listing'];
 
-    public function subscription()
-    {
-        return $this->belongsTo(Subscription::class);
-    }
+    // public function subscription()
+    // {
+    //     return $this->belongsTo(Subscription::class);
+    // }
 }

@@ -5,18 +5,21 @@
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-gray-50/50 border-b border-gray-100">
+                    <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest">ID</th>
                     <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest">Stock Name</th>
                     <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest">Listing</th>
                     <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest">Plan Alignment</th>
                     <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest">Recommended On</th>
-                    <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-right">Action
-                    </th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-50">
                 @forelse($recommendations as $recommendation)
-
                     <tr class="hover:bg-blue-50/30 transition-colors group">
+                        <td class="px-6 py-4">
+                            <div class="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                                {{ $recommendation->id }}
+                            </div>
+                        </td>
                         <td class="px-6 py-4">
                             <div class="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
                                 {{ $recommendation->stock->stock_name }}
@@ -38,17 +41,6 @@
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-500">
                             {{ $recommendation->created_at->format('M d, Y') }}
-                        </td>
-                        <td class="px-6 py-4 text-right">
-                            <button
-                                class="text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors flex items-center justify-end ml-auto group/btn">
-                                Details
-                                <svg class="w-4 h-4 ml-1 transform group-hover/btn:translate-x-1 transition-transform"
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 5l7 7-7 7" />
-                                </svg>
-                            </button>
                         </td>
                     </tr>
                 @empty

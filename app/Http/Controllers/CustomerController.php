@@ -57,14 +57,38 @@ class CustomerController extends Controller
             'name.regex' => 'The customer name may only contain letters and spaces.',
         ]);
 
+        $oldSubscriptionId = $customer->subscription_id;
+        $newSubscriptionId = $validated['subscription_id'];
+        $message = 'Customer updated successfully!';
+
+        if ($oldSubscriptionId != $newSubscriptionId) {
+            $newSubscription = Subscription::findOrFail($newSubscriptionId);
+            $customer->remaining_recommendations += $newSubscription->recommendation_limit;
+            $message = "Plan upgraded! New limit of {$newSubscription->recommendation_limit} added. Total remaining: {$customer->remaining_recommendations}";
+        } elseif ($customer->remaining_recommendations <= 0) {
+            $subscription = Subscription::findOrFail($newSubscriptionId);
+            $customer->remaining_recommendations = $subscription->recommendation_limit;
+            $message = "Plan refilled! Remaining recommendations reset to: {$customer->remaining_recommendations}";
+        }
+
         $customer->update($validated);
 
-        return back()->with('success', 'Customer updated successfully!');
+        return back()->with('success', $message);
     }
 
     public function destroy(Customer $customer)
     {
         $customer->delete();
         return back()->with('success', 'Customer deleted successfully!');
+    }
+
+    public function getCustomerRecommendedStocks()
+    {
+        $recommendations = auth()->user()->recommendations()
+            ->with(['stock', 'subscription'])
+            ->latest()
+            ->paginate(10);
+
+        return view('customer.index', compact('recommendations'));
     }
 }

@@ -87,13 +87,7 @@ Route::middleware(['auth'])->group(function () {
 
     // --- Customer Routes (Role 1) ---
     Route::middleware(['role:1'])->group(function () {
-        Route::get('/customer', function () {
-            $recommendations = Auth::user()->recommendations()
-                ->with(['stock', 'subscription'])
-                ->latest()
-                ->get();
-            return view('customer.index', compact('recommendations'));
-        })->name('customer.index');
+        Route::get('/customer', [CustomerController::class, 'getCustomerRecommendedStocks'])->name('customer.index');
     });
 
 });

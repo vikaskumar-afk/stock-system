@@ -34,8 +34,8 @@
                         <tr class="text-gray-400 text-xs font-bold uppercase tracking-wider border-b border-gray-50">
                             <th class="px-6 py-4">Stock Name</th>
                             <th class="px-6 py-4">Listing</th>
-                            <th class="px-6 py-4">Subscription Plan</th>
-                            <th class="px-6 py-4 text-right">Actions</th>
+                            <!-- <th class="px-6 py-4">Subscription Plan</th> -->
+                            <!-- <th class="px-6 py-4 text-right">Actions</th> -->
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">
@@ -49,7 +49,7 @@
                                         {{ $stock->stock_listing }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4">
+                                <!-- <td class="px-6 py-4">
                                     @if($stock->subscription)
                                         <span class="px-2 py-1 bg-blue-50 text-blue-600 text-xs font-semibold rounded-md">
                                             {{ $stock->subscription->name }}
@@ -60,7 +60,7 @@
                                 </td>
                                 <td class="px-6 py-4 text-right">
                                     <span class="text-gray-400 text-sm italic">No actions</span>
-                                </td>
+                                </td> -->
                             </tr>
                         @empty
                             <tr>
@@ -112,17 +112,7 @@
                                 <option value="NASDAQ">NASDAQ</option>
                             </select>
                         </div>
-                        <div>
-                            <label for="subscription_id" class="block text-sm font-semibold text-gray-700 mb-1">Subscription
-                                Plan</label>
-                            <select id="subscription_id" name="subscription_id" required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
-                                <option value="" disabled selected>Select a plan</option>
-                                @foreach ($subscriptions as $subscription)
-                                    <option value="{{ $subscription->id }}">{{ $subscription->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+
                         <div class="flex justify-end space-x-3 mt-6">
                             <button type="button"
                                 class="px-4 py-2 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition"
