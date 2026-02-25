@@ -40,12 +40,12 @@ class AuthController extends Controller
         ])->onlyInput('email');
     }
 
-private function redirectByRole($role)
-{
-    return $role == 0
-        ? redirect('/admin')     // always go to /admin
-        : redirect('/customer'); // always go to /customer
-}
+    private function redirectByRole($role)
+    {
+        return $role == 0
+            ? redirect('/admin')     // always go to /admin
+            : redirect('/customer'); // always go to /customer
+    }
 
     public function logout(Request $request)
     {
@@ -54,6 +54,6 @@ private function redirectByRole($role)
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login')->with('success', 'You have been logged out successfully.');
+        return redirect()->route('login')->with('success', 'You have been logged out successfully.');
     }
 }

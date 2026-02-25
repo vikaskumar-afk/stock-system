@@ -27,8 +27,9 @@ class Customer extends Authenticatable
         return $this->belongsTo(Subscription::class);
     }
 
-    // public function recommendations()
-    // {
-    //     return $this->hasMany(StockRecommendation::class);
-    // }
+    public function recommendations()
+    {
+        return $this->belongsToMany(StockRecommendation::class, 'recommend_customers', 'customer_id', 'stock_recommend_id')
+            ->withTimestamps();
+    }
 }

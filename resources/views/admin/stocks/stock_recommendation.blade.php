@@ -1,5 +1,22 @@
 @extends('admin.layouts.app')
 
+@push('styles')
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+    <style>
+        .ts-control {
+            border-radius: 0.75rem !important;
+            padding: 0.75rem 1rem !important;
+            border-color: #d1d5db !important;
+        }
+
+        .ts-dropdown {
+            border-radius: 0.75rem !important;
+            margin-top: 0.5rem !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+        }
+    </style>
+@endpush
+
 @section('title', 'Stock Recommendation')
 @section('header_title', 'Stock Recommendation')
 
@@ -17,6 +34,66 @@
                 </svg>
                 Send Recommendation
             </button>
+        </div>
+
+        {{-- Recommendations Listing --}}
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+            <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                <h4 class="font-bold text-gray-800">Sent Recommendations</h4>
+                <!-- <span class="text-xs font-medium text-gray-500 uppercase tracking-wider">Historical records</span> -->
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-gray-50/50 border-b border-gray-100">
+                            <th class="px-8 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Stock</th>
+                            <th class="px-8 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Plan</th>
+                            <th class="px-8 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Target Customers
+                            </th>
+                            <th class="px-8 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Date Sent</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @forelse($recommendations as $rec)
+                            <tr class="hover:bg-gray-50/50 transition duration-150 text-sm">
+                                <td class="px-8 py-5">
+                                    <div class="font-semibold text-gray-900">{{ $rec->stock->stock_name }}</div>
+                                    <!-- <div class="text-xs text-gray-500">{{ $rec->stock->listing_type ?? 'N/A' }}</div> -->
+                                </td>
+                                <td class="px-8 py-5">
+                                    <span
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        {{ $rec->subscription->name }}
+                                    </span>
+                                </td>
+                                <td class="px-8 py-5">
+                                    <div class="flex flex-wrap gap-1">
+                                        @foreach($rec->customers->take(3) as $customer)
+                                            <span class="text-xs text-gray-600 bg-gray-100 px-2 py-0.5 rounded">
+                                                {{ $customer->name }} <span
+                                                    class="opacity-70 text-[10px]">({{ $customer->email }})</span>
+                                            </span>
+                                        @endforeach
+                                        @if($rec->customers->count() > 3)
+                                            <span class="text-xs text-gray-400 font-medium">+{{ $rec->customers->count() - 3 }}
+                                                more</span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td class="px-8 py-5 text-gray-600">
+                                    <div>{{ $rec->created_at->format('M d, Y') }}</div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="px-8 py-12 text-center text-gray-500 italic">
+                                    No recommendations sent yet.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         {{-- Recommendation Modal --}}
@@ -128,13 +205,8 @@
                                 </label>
 
                                 <div class="relative">
-                                    <select name="customer_ids[]" id="customer_ids" multiple class="block w-full px-4 py-3 text-sm border border-gray-300 rounded-xl shadow-sm
-                           focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                           transition duration-200 ease-in-out
-                           bg-white
-                           min-h-[180px]
-                           overflow-y-auto">
-
+                                    <select name="customer_ids[]" id="customer_ids" multiple
+                                        placeholder="Search and select customers..." autocomplete="off">
                                         {{-- Options loaded dynamically --}}
                                     </select>
 
@@ -180,6 +252,7 @@
 @endsection
 
 @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
     <script>
         function openModal(modalId) {
             document.getElementById(modalId).classList.remove('hidden');
@@ -192,6 +265,30 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
+            // Initialize Tom Select
+            const customerSelect = new TomSelect('#customer_ids', {
+                plugins: ['remove_button'],
+                valueField: 'id',
+                labelField: 'name',
+                searchField: ['name', 'email'],
+                placeholder: 'Select target customers...',
+                maxOptions: 1000,
+                render: {
+                    option: function (data, escape) {
+                        return '<div>' +
+                            '<span class="font-medium text-gray-900">' + escape(data.name) + '</span>' +
+                            '<span class="ml-2 text-xs text-gray-500 italic">' + escape(data.email) + '</span>' +
+                            '</div>';
+                    },
+                    item: function (data, escape) {
+                        return '<div>' +
+                            '<span>' + escape(data.name) + '</span>' +
+                            '<span class="ml-1 text-xs opacity-70">(' + escape(data.email) + ')</span>' +
+                            '</div>';
+                    }
+                }
+            });
+
             // Modal Toggler
             const openBtn = document.getElementById('openRecommendationModal');
             if (openBtn) {
@@ -201,26 +298,56 @@
             // AJAX Customer Fetching
             document.getElementById('subscription_id').addEventListener('change', function () {
                 let subscriptionId = this.value;
-                let customerSelect = document.getElementById('customer_ids');
                 let loadingText = document.getElementById('loadingCustomers');
 
-                customerSelect.innerHTML = '';
+                // Clear current options in Tom Select
+                customerSelect.clear();
+                customerSelect.clearOptions();
 
-                if (!subscriptionId) return;
+                if (!subscriptionId) {
+                    customerSelect.enable();
+                    customerSelect.settings.placeholder = "Select target customers...";
+                    customerSelect.inputState();
+                    const existingNotice = document.getElementById('noCustomersNotice');
+                    if (existingNotice) existingNotice.remove();
+                    return;
+                }
 
                 loadingText.classList.remove('hidden');
 
                 fetch(`/admin/subscriptions/${subscriptionId}/customers`)
                     .then(response => response.json())
                     .then(data => {
-                        data.forEach(customer => {
-                            let option = document.createElement('option');
-                            option.value = customer.id;
-                            option.text = `${customer.name} (${customer.email})`;
-                            customerSelect.appendChild(option);
-                        });
-
                         loadingText.classList.add('hidden');
+
+                        if (data.length === 0) {
+                            customerSelect.disable();
+                            customerSelect.settings.placeholder = "No customers found for this plan";
+                            customerSelect.inputState(); // Refresh placeholder
+
+                            // Optional: Show a small text notice
+                            const notice = document.createElement('p');
+                            notice.id = 'noCustomersNotice';
+                            notice.className = 'text-amber-600 text-xs mt-2 font-medium flex items-center';
+                            notice.innerHTML = '<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> This subscription plan currently has no assigned customers.';
+
+                            const existingNotice = document.getElementById('noCustomersNotice');
+                            if (!existingNotice) {
+                                document.getElementById('customer_ids').closest('.relative').after(notice);
+                            }
+                        } else {
+                            customerSelect.enable();
+                            customerSelect.settings.placeholder = "Select target customers...";
+                            customerSelect.inputState();
+
+                            // Remove notice if exists
+                            const existingNotice = document.getElementById('noCustomersNotice');
+                            if (existingNotice) existingNotice.remove();
+
+                            // Add new options to Tom Select
+                            customerSelect.addOptions(data);
+                            customerSelect.refreshOptions(false);
+                        }
                     })
                     .catch(error => {
                         console.error('Error fetching customers:', error);
